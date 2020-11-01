@@ -196,6 +196,8 @@ public class AtualizaStatusRelogioNetwork implements Runnable, Disposable {
 
     @Override
     public void dispose() {
-        this.socket.dispose();
+        if (this.socket!=null) {
+            socket.dispose();
+        }
     }
 }
