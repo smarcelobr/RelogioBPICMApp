@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.SerializationException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,7 +100,10 @@ public class AtualizaStatusRelogioNetwork implements Runnable, Disposable {
             } else {
                 Gdx.app.debug(TAG_TERMINAL, linha);
 
-                if (linha.matches("^\\{.*\\}$")) {
+                if (linha.matches("^ap-list:\\[.*]$")) {
+                    lerAps(linha);
+                } else
+                if (linha.matches("^\\{.*}$")) {
                     lerStatus(linha);
                 }
             }
@@ -124,6 +128,20 @@ public class AtualizaStatusRelogioNetwork implements Runnable, Disposable {
         }
         if (status!=null) {
             atualizaStatus(status);
+        }
+    }
+
+    private void lerAps(String linha) {
+        Json json = new Json();
+        ArrayList<String> aps;
+        try {
+            aps = json.fromJson(ArrayList.class, String.class, linha);
+        } catch (SerializationException ex) {
+            aps = null;
+            Gdx.app.debug(LOG_TAG, "Falha ao decodificar APs.", ex);
+        }
+        if (aps!=null) {
+            statusRelogio.setAps(aps);
         }
     }
 
@@ -192,6 +210,30 @@ public class AtualizaStatusRelogioNetwork implements Runnable, Disposable {
 
     public void saveDifMinutos() {
         sendComando("encoder.ptr.saveDifMinutos();");
+    }
+
+    /**
+     * Lista os Access Points WiFi perto do relogio (nodemcu)
+     */
+    public void listAPs() {
+        String comando = "do\n" +
+                " function listap(t)\n" +
+                "   local ap_list = \"ap-list:[\"\n" +
+                "   local primeiro = true\n" +
+                "   for k,v in pairs(t) do\n" +
+                "     if (primeiro) then\n" +
+                "       primeiro = false\n" +
+                "     else\n" +
+                "       ap_list = ap_list .. \",\"\n" +
+                "     end\n" +
+                "     ap_list = ap_list .. '\"'..k..'\"'\n" +
+                "   end\n" +
+                "   print(ap_list .. \"]\")\n" +
+                " end\n" +
+                " wifi.sta.getap(listap)\n" +
+                "end\n" +
+                "\n";
+        sendComando(comando);
     }
 
     @Override

@@ -33,7 +33,7 @@ public class SettingsScreen extends ScreenAdapter {
         this.app = app;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
-        Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        Skin skin = this.app.skin;
 
         img = new Sprite(new Texture("mainBackground.jpg"));
         img.setSize(WORLD_WIDTH, WORLD_HEIGHT);
@@ -43,25 +43,33 @@ public class SettingsScreen extends ScreenAdapter {
         background.setZIndex(0);
         stage.addActor(background);
 
-        ptrLabel = new Label("Ponteiros", skin);
+        Table table = new Table();
+        /* linha da tabela */
+
+        ptrLabel = new Label("Ponteiros", skin, "hora-font", "white");
         TextButton plusPtrButton = new TextButton("+", skin);
         TextButton minusPtrButton = new TextButton("-", skin);
+
+        table.add(ptrLabel);
+        table.add(plusPtrButton).width(50);
+        table.add(minusPtrButton).width(50);
+
+        /* linha da tabela */
+        table.row();
 
         Label addressLabel = new Label("Address:", skin);
         TextField addressText = new TextField("", skin);
 
-        TextButton salvarButton = new TextButton("Salvar",skin);
-
-        Table table = new Table();
-        table.add(ptrLabel);
-        table.add(plusPtrButton).width(50);
-        table.add(minusPtrButton).width(50);
-        table.row();
         table.add(addressLabel);
         table.add(addressText).width(100);
+
+        /* linha da tabela */
         table.row();
+
+        TextButton salvarButton = new TextButton("Salvar",skin);
         table.add(salvarButton);
 
+        /* encerrando a tabela */
         table.setFillParent(true);
         table.setZIndex(1);
         stage.addActor(table);

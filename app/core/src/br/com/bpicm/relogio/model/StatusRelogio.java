@@ -2,6 +2,8 @@ package br.com.bpicm.relogio.model;
 
 import br.com.bpicm.relogio.model.StatusConexaoEnum;
 
+import java.util.ArrayList;
+
 /**
  * Contem o status do relógio para ser usado durante a renderização.
  *
@@ -16,8 +18,9 @@ public class StatusRelogio {
     private String horaPonteiro = "--:--";
     private String horaRtc = "SNTP connecting...";
     private String mensagem;
+    private ArrayList<String> aps;
 
-    public StatusConexaoEnum getStatusConexao() {
+    public synchronized StatusConexaoEnum getStatusConexao() {
         return statusConexao;
     }
 
@@ -41,7 +44,7 @@ public class StatusRelogio {
         this.horaPonteiro = horaPonteiro;
     }
 
-    public String getHoraRtc() {
+    public synchronized String getHoraRtc() {
         return horaRtc;
     }
 
@@ -49,11 +52,19 @@ public class StatusRelogio {
          this.horaRtc = rtc;
     }
 
-    public void setMensagem(String mensagem) {
+    public synchronized void setMensagem(String mensagem) {
         this.mensagem = mensagem;
     }
 
-    public String getMensagem() {
+    public synchronized String getMensagem() {
         return mensagem;
+    }
+
+    public synchronized void setAps(ArrayList<String> aps) {
+        this.aps = aps;
+    }
+
+    public synchronized ArrayList<String> getAps() {
+        return aps;
     }
 }
