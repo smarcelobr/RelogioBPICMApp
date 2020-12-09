@@ -12,7 +12,7 @@ public class RelogioService implements Disposable  {
     public RelogioService() {
         this.statusRelogio = new StatusRelogio();
 
-        atualizaStatusRelogioNetwork = new AtualizaStatusRelogioNetwork(this.statusRelogio, "192.168.0.114");
+        atualizaStatusRelogioNetwork = new AtualizaStatusRelogioNetwork(this.statusRelogio, "192.168.0.111");
         atualizaStatusRelogioThread = new Thread(
                 atualizaStatusRelogioNetwork);
         atualizaStatusRelogioThread.start();
@@ -49,4 +49,7 @@ public class RelogioService implements Disposable  {
         this.atualizaStatusRelogioNetwork.saveDifMinutos();
     }
 
+    public void updateWifiList() {
+        this.atualizaStatusRelogioNetwork.listAPs();
+    }
 }

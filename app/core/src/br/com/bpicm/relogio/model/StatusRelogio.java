@@ -1,8 +1,11 @@
 package br.com.bpicm.relogio.model;
 
-import br.com.bpicm.relogio.model.StatusConexaoEnum;
+import br.com.bpicm.relogio.events.IRelogioEventHandler;
+import br.com.bpicm.relogio.events.IStatusRelogioEventListener;
+import br.com.bpicm.relogio.events.IWifiAPListEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Contem o status do relógio para ser usado durante a renderização.
@@ -19,6 +22,7 @@ public class StatusRelogio {
     private String horaRtc = "SNTP connecting...";
     private String mensagem;
     private ArrayList<String> aps;
+    private final List<IStatusRelogioEventListener> eventListeners = new ArrayList<>();
 
     public synchronized StatusConexaoEnum getStatusConexao() {
         return statusConexao;
@@ -60,8 +64,32 @@ public class StatusRelogio {
         return mensagem;
     }
 
-    public synchronized void setAps(ArrayList<String> aps) {
+    public synchronized void setAps(final ArrayList<String> aps) {
         this.aps = aps;
+
+        fireEvent(IWifiAPListEventListener.class,
+                new IRelogioEventHandler<IWifiAPListEventListener>() {
+            @Override
+            public void handle(IWifiAPListEventListener listener) {
+                listener.updated(aps);
+            }
+        });
+    }
+
+    public <T extends IStatusRelogioEventListener> void addListener(T listener) {
+        this.eventListeners.add(listener);
+    }
+
+    private <T extends IStatusRelogioEventListener> void fireEvent(Class<T> eventListenerClass, IRelogioEventHandler<T> handler) {
+        for (IStatusRelogioEventListener listener: this.eventListeners) {
+            if (eventListenerClass.isInstance(listener)) {
+                handler.handle((T) listener);
+            }
+        }
+    }
+
+    public <T extends IStatusRelogioEventListener> void removeListener(T listener) {
+        this.eventListeners.remove(listener);
     }
 
     public synchronized ArrayList<String> getAps() {

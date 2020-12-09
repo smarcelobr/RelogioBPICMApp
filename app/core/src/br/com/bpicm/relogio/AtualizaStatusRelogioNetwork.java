@@ -101,7 +101,7 @@ public class AtualizaStatusRelogioNetwork implements Runnable, Disposable {
                 Gdx.app.debug(TAG_TERMINAL, linha);
 
                 if (linha.matches("^ap-list:\\[.*]$")) {
-                    lerAps(linha);
+                    lerAps(linha.substring(8));
                 } else
                 if (linha.matches("^\\{.*}$")) {
                     lerStatus(linha);
@@ -136,6 +136,7 @@ public class AtualizaStatusRelogioNetwork implements Runnable, Disposable {
         ArrayList<String> aps;
         try {
             aps = json.fromJson(ArrayList.class, String.class, linha);
+
         } catch (SerializationException ex) {
             aps = null;
             Gdx.app.debug(LOG_TAG, "Falha ao decodificar APs.", ex);
